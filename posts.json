@@ -1,0 +1,9 @@
+[
+  {
+    "title": "Welcome to Simple Blog",
+    "slug": "welcome",
+    "date": "2024-11-30",
+    "content": "# Welcome to Simple Blog\n\n2024-11-30\n\nThis is your first blog post! It's stored as a simple markdown file in the `posts/` directory.\n\n## How it works\n\n- Each markdown file in the `posts/` directory becomes a blog post\n- The filename (without `.md`) becomes the URL slug\n- The first H1 heading is used as the post title\n- The first date in YYYY-MM-DD format is used as the publication date\n\n## Publishing\n\nWhen you push changes to this repository:\n\n1. GitHub Actions automatically runs `npm run build`\n2. This converts all markdown posts to a `posts.json` file\n3. The Worker bundle is deployed to Cloudflare\n4. Your blog is live at `https://blog.lovemaggi.de/`\n\nTry editing this file or adding a new markdown file to the `posts/` directory!\n",
+    "excerpt": "# Welcome to Simple Blog\n\n2024-11-30"
+  }
+]

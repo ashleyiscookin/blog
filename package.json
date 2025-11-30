@@ -1,0 +1,17 @@
+{
+    "name": "simple-blog",
+    "version": "1.0.0",
+    "description": "A simple blog powered by Cloudflare Workers with markdown posts",
+    "type": "module",
+    "scripts": {
+        "dev": "wrangler dev",
+        "deploy": "wrangler deploy",
+        "build": "node scripts/build.js"
+    },
+    "dependencies": {
+        "marked": "^11.0.0"
+    },
+    "devDependencies": {
+        "wrangler": "^3.51.0"
+    }
+}
