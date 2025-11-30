@@ -1,3 +1,21 @@
+
+## Required Setup for Deployment
+
+Before the CI/CD pipeline can deploy:
+
+1. **Configure GitHub Secrets** in repository settings:
+  - Go to Settings → Secrets and variables → Actions
+  - Add `CLOUDFLARE_API_TOKEN`: Generate at https://dash.cloudflare.com/profile/api-tokens (requires Workers & Zones write permission)
+  - Add `CLOUDFLARE_ACCOUNT_ID`: Found in Cloudflare dashboard URL or account settings
+
+2. **DNS Setup** (one-time):
+  - Add DNS records to route `blog.lovemaggi.de` via Cloudflare (if not already configured)
+  - Route must be under the `lovemaggi.de` zone in your Cloudflare account
+
+3. **Local Testing** (optional):
+  - Authenticate with Cloudflare: `npx wrangler login`
+  - Run `npm run dev` for local preview
+  - Run `npm run deploy` to test deployment locally (requires valid secrets)
 # Simple Blog - Copilot Instructions
 
 ## Project Overview
