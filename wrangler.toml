@@ -2,17 +2,9 @@ name = "simple-blog"
 main = "src/index.js"
 compatibility_date = "2024-11-01"
 
-[env.production]
-routes = [
-  {
-    pattern = "blog.lovemaggi.de/*",
-    zone_name = "lovemaggi.de"
-  }
-]
-
-[[migrations]]
-tag = "v1"
-new_classes = ["BlogPost"]
+[[routes]]
+pattern = "blog.lovemaggi.de/*"
+zone_name = "lovemaggi.de"
 
 [observability]
 enabled = false
