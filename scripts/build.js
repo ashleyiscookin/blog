@@ -111,8 +111,18 @@ function buildPostsJson() {
             return trimmed && !trimmed.startsWith('# ') && !/^\d{4}-\d{2}-\d{2}$/.test(trimmed);
         });
         
-        // Take first 3 lines of actual content, or empty if no content
-        const excerpt = contentLines.slice(0, 3).join('\n');
+        // Take first 3 lines of actual content, sanitize markdown syntax
+        let excerpt = contentLines.slice(0, 3).join('\n');
+        
+        // Replace markdown syntax with generic words or remove it
+        excerpt = excerpt
+            .replace(/!\[([^\]]*)\]\([^)]*\)/g, 'image') // ![alt](url) -> image
+            .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // [text](url) -> text
+            .replace(/\*\*([^*]+)\*\*/g, '$1') // **bold** -> bold
+            .replace(/\*([^*]+)\*/g, '$1') // *italic* -> italic
+            .replace(/__([^_]+)__/g, '$1') // __bold__ -> bold
+            .replace(/_([^_]+)_/g, '$1') // _italic_ -> italic
+            .replace(/`([^`]+)`/g, '$1'); // `code` -> code
 
         return {
             title,
