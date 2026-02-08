@@ -40,10 +40,11 @@ function getLastCommitDate(filePath) {
 
 function extractMetadata(content, filename = '', commitDate = null) {
     const lines = content.split('\n');
-    let title = 'Untitled';
+    // Use filename as default title (without .md extension)
+    let title = filename.replace(/\.md$/, '').trim();
     let date = null;
 
-    // Look for H1 as title
+    // Look for H1 as title (overrides filename)
     const titleMatch = lines.find(line => line.startsWith('# '));
     if (titleMatch) {
         title = titleMatch.replace('# ', '').trim();
