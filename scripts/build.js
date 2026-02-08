@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const postsDir = path.join(__dirname, '../posts');
@@ -15,10 +16,27 @@ function slugify(text) {
         .replace(/-+/g, '-');
 }
 
-function extractMetadata(content) {
+function getLastCommitDate(filePath) {
+    try {
+        const date = execSync(`git log -1 --format=%ci -- "${filePath}"`, {
+            encoding: 'utf-8',
+            cwd: path.dirname(__dirname)
+        }).trim();
+        
+        if (date) {
+            // Extract YYYY-MM-DD from git date format (YYYY-MM-DD HH:MM:SS +TIMEZONE)
+            return date.split(' ')[0];
+        }
+    } catch (error) {
+        // File not in git or git error
+    }
+    return null;
+}
+
+function extractMetadata(content, filename = '', commitDate = null) {
     const lines = content.split('\n');
     let title = 'Untitled';
-    let date = new Date().toISOString().split('T')[0];
+    let date = null;
 
     // Look for H1 as title
     const titleMatch = lines.find(line => line.startsWith('# '));
@@ -26,10 +44,38 @@ function extractMetadata(content) {
         title = titleMatch.replace('# ', '').trim();
     }
 
-    // Look for date in format: YYYY-MM-DD
+    // Look for date in format: YYYY-MM-DD in content
     const dateMatch = content.match(/(\d{4}-\d{2}-\d{2})/);
     if (dateMatch) {
         date = dateMatch[1];
+    }
+
+    // If no date found in content, try to extract from filename
+    if (!date) {
+        // Try YYYY-MM-DD format in filename
+        const filenameDateMatch = filename.match(/(\d{4}-\d{2}-\d{2})/);
+        if (filenameDateMatch) {
+            date = filenameDateMatch[1];
+        } else {
+            // Try DD.MM.YY format (e.g., 01.01.25 -> 2025-01-01)
+            const dotDateMatch = filename.match(/(\d{2})\.(\d{2})\.(\d{2})/);
+            if (dotDateMatch) {
+                const [, day, month, year] = dotDateMatch;
+                // Assume 20xx if year is 00-99
+                const fullYear = parseInt(year) > 30 ? `19${year}` : `20${year}`;
+                date = `${fullYear}-${month}-${day}`;
+            }
+        }
+    }
+
+    // Fallback to git commit date if available
+    if (!date && commitDate) {
+        date = commitDate;
+    }
+
+    // Fallback to today's date if still not found
+    if (!date) {
+        date = new Date().toISOString().split('T')[0];
     }
 
     return { title, date };
@@ -47,7 +93,8 @@ function buildPostsJson() {
     const posts = files.map(file => {
         const filePath = path.join(postsDir, file);
         const content = fs.readFileSync(filePath, 'utf-8');
-        const { title, date } = extractMetadata(content);
+        const commitDate = getLastCommitDate(filePath);
+        const { title, date } = extractMetadata(content, file, commitDate);
         const slug = slugify(file.replace('.md', ''));
 
         return {
