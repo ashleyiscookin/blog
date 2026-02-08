@@ -18,9 +18,14 @@ function slugify(text) {
 
 function getLastCommitDate(filePath) {
     try {
-        const date = execSync(`git log -1 --format=%ci -- "${filePath}"`, {
+        const repoRoot = path.join(__dirname, '..');
+        // Use relative path from repo root for git command
+        const relativeFilePath = path.relative(repoRoot, filePath);
+        
+        const date = execSync(`git log -1 --format=%ci -- "${relativeFilePath}"`, {
             encoding: 'utf-8',
-            cwd: path.dirname(__dirname)
+            cwd: repoRoot,
+            stdio: ['pipe', 'pipe', 'pipe']
         }).trim();
         
         if (date) {
@@ -28,7 +33,7 @@ function getLastCommitDate(filePath) {
             return date.split(' ')[0];
         }
     } catch (error) {
-        // File not in git or git error
+        // File not in git or git error - silently fail and return null
     }
     return null;
 }
